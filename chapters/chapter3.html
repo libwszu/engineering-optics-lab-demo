@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第三章 平面与平面系统 · 工程光学仿真平台</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="stylesheet" href="../css/style.css?v=20260912a" />
+</head>
+<body>
+  <div class="app">
+        <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">光</div>
+        <div>
+          <div class="logo-text">工程光学</div>
+          <div class="logo-subtitle">仿真实验平台</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">导航</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="../index.html">📚 章节总览</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">已开发章节</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="chapter1.html">① 第一章 几何光学基本定律<span class="nav-badge">Ready</span></a></li>
+          <li class="nav-item"><a href="chapter2.html">② 第二章 理想光学系统<span class="nav-badge">Ready</span></a></li>
+          <li class="nav-item active"><a href="chapter3.html">③ 第三章 平面与平面系统<span class="nav-badge">Ready</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">本章内容</div>
+        <ul class="nav-list" id="topic-nav"></ul>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb"><a href="../index.html">首页</a> / <a href="chapter3.html">第三章</a> / <span id="bc-topic">平面镜转动性质</span></div>
+      <div class="page-header"><div><h1 class="page-title">第三章 · 平面与平面系统</h1><p class="page-subtitle">平面镜、平行平板、折射棱镜与双光楔测微 · 对应教材正文第 35、39–40 页（PDF 第 42、46–47 页）</p></div><span class="pill pill-green"><span class="dot"></span> 实时仿真</span></div>
+
+      <div class="chapter9-tab-group-title">平面镜与测量</div>
+      <div class="tabs" id="mirror-tabs"><div class="tab active" data-topic="plane-mirror-rotation">① 平面镜转动</div><div class="tab" data-topic="mirror-measurement">② 微小位移测角</div></div>
+      <div class="chapter9-tab-group-title">折射平面元件</div>
+      <div class="tabs" id="plate-tabs"><div class="tab" data-topic="parallel-plate">③ 平行平板</div><div class="tab" data-topic="prism">④ 折射棱镜</div></div>
+      <div class="chapter9-tab-group-title">微小角度与位移</div>
+      <div class="tabs" id="wedge-tabs"><div class="tab" data-topic="double-wedge">⑤ 双光楔测微</div></div>
+      <div class="chapter9-tab-group-title">3D 经典棱镜系统（教材第 36–38 页）</div>
+      <div class="tabs" id="prism3d-tabs"><div class="tab" data-topic="prism-3d">🧊 ⑥ 3D 棱镜立体模型库</div></div>
+
+      <div class="card mb-4" id="theory-card"></div>
+      <div class="grid workspace-grid">
+        <div class="card" id="controls-panel"><div class="card-header"><div><div class="card-title">参数控制</div><div class="card-subtitle">实时调节 · 自动重绘</div></div><button class="btn btn-ghost btn-icon" id="reset-btn" title="恢复默认">↺</button></div><div id="controls"></div></div>
+        <div><div class="viz-container" id="viz" style="height:500px;"><div class="viz-header"><div class="viz-title" id="viz-title">—</div><div class="viz-toolbar"><button class="btn" id="play-btn">⏸ 暂停</button><button class="btn" id="snapshot-btn">📷 截图</button></div></div><canvas id="canvas"></canvas><div class="viz-legend" id="legend"></div></div><div class="grid grid-3 mt-3" id="readouts"></div></div>
+      </div>
+      <div class="card mt-4"><div class="card-title mb-2">💡 实验提示</div><div class="text-secondary" id="hints" style="font-size:13px;line-height:1.8;"></div></div>
+    </main>
+  </div>
+
+  <script src="../js/sim-core.js?v=20260912a"></script>
+  <script src="../js/sim-geometric.js?v=20260912a"></script>
+  <script>
+    const TOPICS = {
+      "plane-mirror-rotation": { name: "平面镜转动性质", sidebar: "① 平面镜转动性质", theory: '<div class="card-title mb-2">① 平面镜转动性质 · 式（3-1）/ 图 3-1</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">保持入射点和入射光线不变，平面镜绕转轴转动 θ 时，法线同步转动 θ，反射光线相对初始方向转动 2θ；平面镜所成虚像与物体关于镜面严格对称（AA′ ⟂ 镜面，BB′ ⟂ 镜面，d=d′），虚像随镜面转动 2θ。</div><div class="formula">Δφ<sub>反射光</sub> = 2θ；物像连线严格垂直镜面且等距 (d=d′)</div><div class="note">画布清晰呈现物像垂直连线、直角符号、等距标记及转角 θ 与反射偏角 2θ 弧线。</div>', hints: "将 θ 调到正负两侧，观察虚像随镜面以 2θ 同步旋转，物像连线始终与镜面垂直并保持等距。", legend: "金色：实物 AB · 紫色：虚像 A′B′ (镜像旋转 2θ) · 灰虚线：AA′/BB′ 垂直等距连线 · 蓝色：入射光 · 绿色：反射光 · 青色弧：2θ 偏角" },
+      "mirror-measurement": { name: "平面镜微小位移与角度测量", sidebar: "② 平面镜微小位移测角", theory: '<div class="card-title mb-2">② 平面镜微小位移与角度测量 · 式（3-2）/ 图 3-2</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">刻有标尺的焦面 F 点经准直物镜后成为平行光；平面镜绕光轴支点偏转小角度 θ 后，平行光线严格交于倾斜镜面无穿模，反射光偏转 2θ 并由透镜会聚到 F₁。测杆长 a、位移 x，则 θ≈x/a。</div><div class="formula">θ ≈ x/a；FF₁ = f′tan(2θ) ≈ 2f′θ = (2f′/a)x</div><div class="note">画布完整标注平面镜转角 θ、反射光转角 2θ、测杆支点距 a、位移 x 及焦面位移 FF₁，光线与倾斜镜面精准交接。</div>', hints: "调节微小位移 x 或支点距 a，观察镜面倾角 θ 标注弧与反射光转角 2θ，验证焦平面像点 FF₁ 的线性位移与光学放大效应。", legend: "蓝色：准直入射光 · 绿色：返回会聚光 · 黄色：倾斜镜面(标注转角 θ) · 灰色：测杆 a 与位移 x · 紫色：焦面位移 FF₁" },
+      "parallel-plate": { name: "光线通过平行平板", sidebar: "③ 光线通过平行平板", theory: '<div class="card-title mb-2">③ 光线通过平行平板 · 教材 PDF 第 42 页式（3-3）（3-4）</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">平行平板由两个相互平行的折射面组成，出射光线与入射光线平行，但会产生侧向位移和轴向位移。</div><div class="formula">ΔT = d sin(I₁−I₁′)/cos I₁′；ΔL′ = d[1−tan I₁′/tan I₁]</div><div class="note">近轴时 ΔL′≈d(1−1/n)，平板不改变近轴放大率，但不同孔径角的光线轴向位移不同。</div>', hints: "分别改变厚度、折射率和入射角，验证侧向位移随 d 增大、随入射角变化；出射方向保持平行。", legend: "蓝色：入射光 · 紫色：板内折射光 · 绿色：出射光 · 黄色虚线：无平板参考" },
+      prism: { name: "光线通过折射棱镜", sidebar: "④ 光线通过折射棱镜", theory: '<div class="card-title mb-2">④ 光线通过折射棱镜 · 教材 PDF 第 46 页式（3-6）（3-7）</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">棱镜使光线产生偏向角 δ，δ 是入射角、顶角 α 和折射率 n 的函数；在对称入射时取得最小偏向角。</div><div class="formula">δ = I₁ + I₂′ − α；sin[(α+δₘ)/2] = n sin(α/2)</div><div class="note">右侧曲线给出偏向角随入射角的变化，最低点对应最小偏向角测量法。</div>', hints: "改变顶角和折射率，观察偏向曲线最低点；把入射角调到对称位置，可用 δₘ 反推 n。", legend: "蓝色：入射光 · 紫色：棱镜内光线 · 绿色：出射光 · 黄色：δ-I 曲线" },
+      "double-wedge": { name: "双光楔测微", sidebar: "⑤ 双光楔测微", theory: '<div class="card-title mb-2">⑤ 双光楔测微 · 教材 PDF 第 46–47 页式（3-9）（3-10）</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">两块小楔角光楔相对旋转或沿轴向微移，都能把微小机械量变成可观测的出射光偏向或垂轴位移。</div><div class="formula">δ = 2α(n−1)cosφ；Δy = α(n−1)Δz</div><div class="note">当两光楔同向放置时偏向最大；相对转过 90° 时偏向降为零；平移测量则给出线性位移转换关系。</div>', hints: "先扫描 φ，观察 cosφ 曲线；再改变 Δz，验证垂轴位移与轴向位移成正比。", legend: "蓝/粉：两块光楔 · 青色：δ-φ 曲线 · 粉色：Δy-Δz 曲线" },
+      "prism-3d": { 
+        name: "3D 经典棱镜立体模型库（教材 P36–38）", 
+        sidebar: "⑥ 3D 棱镜立体模型库", 
+        theory: '<div class="card-title mb-2">3D 经典棱镜系统 · 教材第 36–38 页（图 3-4 ~ 图 3-11）</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">系统完整构建了教材正文第 36–38 页全部 10 大类（15 种形态）3D 棱镜模型：包括<b>一次反射棱镜</b>（直角棱镜、等腰棱镜、道威棱镜水平及旋转状态）；<b>二次反射棱镜</b>（半五角、30°直角、五角棱镜、直角折返、斜方棱镜）；<b>特种与复合棱镜</b>（直角屋脊棱镜、施密特棱镜、立方角锥全向回归反射器、3-CCD 分色棱镜组）；以及<b>转像棱镜系统</b>（普罗 I 型双直角正交组合、普罗 II 型紧凑胶合系统）。</div><div class="formula">物坐标 (x,y,z) -> 棱镜折/反射 -> 像坐标 (x′,y′,z′)；奇数次反射成镜像，偶数次反射保持原手性</div><div class="note">支持鼠标在画布中按住左键自由 3D 旋转视角、滚轮缩放；道威棱镜可调节转角验证“转θ像转2θ”；五角棱镜可微摆验证 90° 恒定偏角；角反射器可调节三维入射角验证全向反向回归。</div>', 
+        hints: "在控制面板选择不同的 3D 棱镜模型；在画布上按住鼠标左键任意拖拽旋转视角，滑动滚轮缩放；调节道威棱镜转角或光束模式观察立体光路。", 
+        legend: "🔴 X轴 · 🟢 Y轴 · 🔵 Z轴 · 🟡 空间光线与折/反射光路 · 🟨 镀银反射面 · 🟣 屋脊面 · 🔵🔴 3-CCD分色膜" 
+      },
+    };
+    const tabs = document.querySelectorAll(".tabs .tab");
+    const nav = document.getElementById("topic-nav");
+    Object.entries(TOPICS).forEach(([key, topic], index) => {
+      const li = document.createElement("li");
+      li.className = "nav-item" + (index === 0 ? " active" : "");
+      li.innerHTML = `<a href="#" data-key="${key}">${topic.sidebar}</a>`;
+      nav.appendChild(li);
+    });
+    const navItems = [...nav.querySelectorAll(".nav-item")];
+    let simInstance;
+    function switchTopic(key) {
+      const topic = TOPICS[key];
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.topic === key));
+      navItems.forEach((item) => item.classList.toggle("active", item.querySelector("a").dataset.key === key));
+      document.getElementById("theory-card").innerHTML = topic.theory;
+      document.getElementById("bc-topic").textContent = topic.name;
+      document.getElementById("viz-title").textContent = topic.name;
+      document.getElementById("hints").innerHTML = topic.hints;
+      document.getElementById("legend").innerHTML = `<div class="viz-legend-item"><span class="viz-legend-dot" style="background:#4ade80"></span>${topic.legend}</div>`;
+      if (simInstance) simInstance.destroy(); 
+      if (key === "prism-3d") {
+        const PrismClass = window.Prism3DSim || Prism3DSim;
+        simInstance = new PrismClass("canvas", "controls", key);
+      } else {
+        const GeoClass = window.GeometricSim || GeometricSim;
+        simInstance = new GeoClass("canvas", "controls", key);
+      }
+      const isPlaying = Boolean(simInstance.params?.play || simInstance.params?.autoRotate);
+      document.getElementById("play-btn").textContent = isPlaying ? "⏸ 暂停" : "▶ 播放";
+      document.getElementById("reset-btn").onclick = () => {
+        simInstance.reset();
+        const p = Boolean(simInstance.params?.play || simInstance.params?.autoRotate);
+        document.getElementById("play-btn").textContent = p ? "⏸ 暂停" : "▶ 播放";
+      };
+      document.getElementById("play-btn").onclick = (event) => simInstance.togglePlay(event.currentTarget);
+      document.getElementById("snapshot-btn").onclick = () => simInstance.snapshot();
+    }
+    tabs.forEach((tab) => tab.addEventListener("click", () => switchTopic(tab.dataset.topic)));
+    navItems.forEach((item) => item.querySelector("a").addEventListener("click", (event) => {
+      event.preventDefault();
+      switchTopic(event.currentTarget.dataset.key);
+    }));
+    document.addEventListener("DOMContentLoaded", () => switchTopic("plane-mirror-rotation"));
+  </script>
+</body>
+</html>

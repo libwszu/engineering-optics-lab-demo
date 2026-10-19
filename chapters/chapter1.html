@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第一章 几何光学基本定律 · 工程光学仿真平台</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="stylesheet" href="../css/style.css?v=20260912a" />
+</head>
+<body>
+  <div class="app">
+        <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">光</div>
+        <div>
+          <div class="logo-text">工程光学</div>
+          <div class="logo-subtitle">仿真实验平台</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">导航</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="../index.html">📚 章节总览</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">已开发章节</div>
+        <ul class="nav-list">
+          <li class="nav-item active"><a href="chapter1.html">① 第一章 几何光学基本定律<span class="nav-badge">Ready</span></a></li>
+          <li class="nav-item"><a href="chapter2.html">② 第二章 理想光学系统<span class="nav-badge">Ready</span></a></li>
+          <li class="nav-item"><a href="chapter3.html">③ 第三章 平面与平面系统<span class="nav-badge">Ready</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">本章内容</div>
+        <ul class="nav-list" id="topic-nav"></ul>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb"><a href="../index.html">首页</a> / <a href="chapter1.html">第一章</a> / <span id="bc-topic">直线传播定律</span></div>
+      <div class="page-header"><div><h1 class="page-title">第一章 · 几何光学基本定律</h1><p class="page-subtitle">直线传播、反射、折射/全反射、费马原理与马吕斯–杜潘定理 · 按教材基础定律整理</p></div><span class="pill pill-green"><span class="dot"></span> 实时仿真</span></div>
+
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-topic="straight">① 直线传播</div>
+        <div class="tab" data-topic="reflection">② 反射定律</div>
+        <div class="tab" data-topic="refraction">③ 折射 / 全反射</div>
+        <div class="tab" data-topic="fermat">④ 费马原理</div>
+        <div class="tab" data-topic="malus">⑤ 马吕斯–杜潘定理</div>
+        <div class="tab" data-topic="perfect-imaging">⑥ 完善成像·三等价条件</div>
+        <div class="tab" data-topic="sphere-paraxial">⑦ 球面近轴·折射与反射</div>
+        <div class="tab" data-topic="sphere-exact">⑧ 球面实际光路·折射与反射</div>
+      </div>
+
+      <div class="card mb-4" id="theory-card"></div>
+      <div class="grid workspace-grid">
+        <div class="card" id="controls-panel"><div class="card-header"><div><div class="card-title">参数控制</div><div class="card-subtitle">实时调节 · 自动重绘</div></div><button class="btn btn-ghost btn-icon" id="reset-btn" title="恢复默认">↺</button></div><div id="controls"></div></div>
+        <div><div class="viz-container" id="viz" style="height:500px;"><div class="viz-header"><div class="viz-title" id="viz-title">—</div><div class="viz-toolbar"><button class="btn" id="play-btn">⏸ 暂停</button><button class="btn" id="snapshot-btn">📷 截图</button></div></div><canvas id="canvas"></canvas><div class="viz-legend" id="legend"></div></div><div class="grid grid-3 mt-3" id="readouts"></div></div>
+      </div>
+      <div class="card mt-4"><div class="card-title mb-2">💡 实验提示</div><div class="text-secondary" id="hints" style="font-size:13px;line-height:1.8;"></div></div>
+    </main>
+  </div>
+
+  <script src="../js/sim-core.js?v=20260912a"></script>
+  <script src="../js/sim-geometric.js?v=20260912a"></script>
+  <script>
+    const TOPICS = {
+      straight: { name: "直线传播定律", sidebar: "① 直线传播定律", theory: '<div class="card-title mb-2">① 光的直线传播定律</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">在各向同性的均匀介质中，光沿直线传播。调节折射率只改变传播速度，不改变几何路径。</div><div class="formula">v = c/n；均匀介质内光线为直线（dθ/ds = 0）</div><div class="note">调节【光源高度 y】点光源上下平移，光束整体平行平移；调节【光束展开角 2θ】改变发散角，每条光线在介质中仍沿严格直线前进。</div>', hints: "调节【光源高度 y】平移点光源位置；调节【光束展开角 2θ】改变光线发散范围；调节折射率 n 观察光速读数变化。", legend: "蓝色：传播光线 · 金色：点光源 S · 白点：光子 · 浅白虚线：光轴" },
+      reflection: { name: "反射定律", sidebar: "② 反射定律", theory: '<div class="card-title mb-2">② 光的反射定律</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">反射光线、入射光线和入射点法线位于同一平面，反射角与入射角相等，且反射光线与入射光线分居法线两侧。</div><div class="formula">i = r；Δφ<sub>反射光</sub> = 2θ</div><div class="note">保持入射光线固定，旋转镜面 θ 时，法线同步旋转 θ，反射光方向随镜面转角改变 2 倍（2θ），这一性质在第三章测角模型中继续使用。</div>', hints: "改变入射光方向验证 i=r；保持入射光固定并转动镜面，观察法线转动 θ 时反射光线转动 2θ（绿色虚线为 θ=0° 时的初始反射光）。", legend: "蓝色：固定入射光 · 绿色：反射光 · 绿虚线：初始反射方向 · 黄色虚线：法线" },
+      refraction: { name: "折射 / 全反射", sidebar: "③ 折射定律 · 全反射", theory: '<div class="card-title mb-2">③ 折射定律与全反射</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">折射光线、入射光线和法线共面；入射角与折射角的正弦比由两介质折射率决定。</div><div class="formula">n₁ sin i = n₂ sin r；sin i<sub>c</sub> = n₂/n₁（n₁&gt;n₂）</div><div class="note">当光从光密介质进入光疏介质且 i≥i<sub>c</sub> 时，折射光消失，能量转为反射光，这就是全反射。</div>', hints: "把 n₁ 调大或 n₂ 调小，再逐步增加入射角，观察折射光在临界角处变为全反射。", legend: "蓝色：入射光 · 绿色：折射光 · 橙色：反射光" },
+      fermat: {
+        name: "费马原理与极值光程",
+        sidebar: "④ 费马原理 · 极值光程",
+        theory: '<div class="card-title mb-2">④ 费马原理 (Fermat\'s Principle)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">光在两点间传播的实际路径，是光程取极值（通常是极大、极小或恒定值，即一阶变分为零）的平稳光程路径。</div><div class="formula">δ ∫_A^B n · ds = 0 ； 几何光学基本定律均可由费马原理统一推导</div><div class="note"><b>物理意义与模型展示：</b><br>1. <b>反射极值路径：</b>在平面镜上移动测试反射点 x，从点 A 到点 B 的总光程 L(x) = |AP| + |PB| 形成下凹单峰曲线，其极值点严格对应入射角等于反射角 (i = r) 的物理路径！<br>2. <b>动态寻优：</b>可拖动【当前反射点位置】或点击播放，实时追踪光程曲线并在最优点（绿色虚线）处驻留。</div>',
+        hints: "调节【当前反射点位置】观察下方坐标系中的测试黄点沿光程曲线移动；当光程达到理论最小值（绿色虚线）时，入射角严格等于反射角。",
+        legend: "蓝色/绿色：入射与反射光线 · 紫色曲线：总光程 L(x) · 金色圆点：当前测试点 · 绿色虚线：极值最优点",
+      },
+      malus: { name: "马吕斯–杜潘定理", sidebar: "⑤ 马吕斯–杜潘定理", theory: '<div class="card-title mb-2">⑤ 马吕斯–杜潘定理（几何光学正交光线束）</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">与第十一章偏振光的马吕斯偏振定律不同，本章讨论的是正交光线束与等光程波面定理：垂直于某一波面的光线束，经各向同性介质任意次反射或折射后，各光线仍与出射等光程波面严格正交。</div><div class="formula">光线方向 ∥ ∇S；n₁sin i = n₂sin r；等光程面 OPL = n₁s₁ + n₂s₂ = C ⟂ 光线</div><div class="note"><b>物理意义与双波面验证：</b><br>1. <b>平面波：</b>平行光束与平面波前正交，折射后仍为平面波面且处处垂直。<br>2. <b>球面波：</b>点光源 S 发出同心光束（球面波面 Σ₁），经界面折射后虽产生像差，但各光线到达出射波面 Σ₂ 的光程恒定（OPL 恒为常数），折射光线处处与新波面垂直正交！</div>', hints: "可在控制面板顶部切换【平面波 (平行光)】与【球面波 (点光源)】形态；调节折射率比、点光源物距与孔径角，观察折射光线与等光程波面始终保持 90° 正交标注。", legend: "蓝/绿：入射与折射光线 · 蓝/绿弧线：波面 Σ₁, Σ₂ · 橙色：全反射 · 90°/角符：正交标示" },
+      "perfect-imaging": {
+        name: "完善成像的基本概念与三个等价条件 (教材第二页)",
+        sidebar: "⑥ 完善成像·三等价条件",
+        theory: '<div class="card-title mb-2">⑥ 成像的基本概念与完善成像条件 (教材第 2 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">光学系统的作用之一是对物体成像。若一个物点对应的一束同心光束，经光学系统后仍为同心光束，该光束的中心即为该物点的完善像点。物体上每个点经光学系统后所成完善像点的集合就是该物体经光学系统后的完善像。</div><div class="formula-label">物像空间与实虚定义 (教材 P2)</div><div class="formula">物空间与像空间范围均为 (−∞, +∞)；<br>实际光线相交 ⇛ 实物 / 实像； 光线反向延长线相交 ⇛ 虚物 / 虚像</div><div class="formula-label">光学系统成完善像的三个等价条件 (满足其一即全部满足)</div><div class="formula">① <b>入射波面是球面波时，出射波面也是球面波</b>；<br>② <b>入射光是同心光束时，出射光也是同心光束</b>；<br>③ <b>物点及其像点之间任意两条光路的光程相等</b>：(AA′)₁ = (AA′)₂ = ... = 常数 (ΔOPL ≡ 0)</div><div class="note"><b>三大条件的内在统一性与物理实质：</b><br>1. <b>马吕斯–杜潘定理桥梁：</b>根据马吕斯定理，光线束恒垂直于等光程波面。同心光线束的正交波面必定是以其汇聚中心为球心的同心球面波，因此条件①与条件②互为充要条件。<br>2. <b>费马原理与零波像差：</b>同一波前各点到像点的光程恒等，由物点到像点的任意光路总光程必恒等，即条件③等价于无波像差 (ΔW = 0)。<br>3. <b>像差产生的本质：</b>当任何一个条件不满足（如球差导致光束不再同心交于一点），出射波面必定偏离球面，各光线光程也必定不相等，三者同步被破坏！</div>',
+        hints: "可在控制面板切换【综合三等价】、【① 球面波面】、【② 同心光束】与【③ 任意光路等光程】四种视角；对比【完善成像系统】与【非完善系统 (产生球差)】，观察出射波面变形、焦散弥散斑与光程差 ΔOPL 的同步涌现。",
+        legend: "金色：物点 A 及同心光束 · 绿色：完善像点 A′ · 橙色：球差弥散斑与像差波面 · 弧线：球面波面 Σ₁, Σ₂ · ⊥：正交符"
+      },
+      "sphere-paraxial": {
+        name: "单个球面 (折射与反射) · 近轴光路与四个放大率",
+        sidebar: "⑦ 球面近轴·四个放大率",
+        theory: '<div class="card-title mb-2">⑦ 单个球面 (折射与反射) · 近轴光路与四个放大率 (教材 P3-5 / PDF 第10页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">在近轴区 (sinθ ≈ θ)，物点与像点一一对应。折射球面与反射球面镜遵循统一的高斯共轭规律 (反射镜令 n′ = −n)。</div><div class="formula-label">折射球面物像公式与焦距 (式 1-10 ~ 1-12)</div><div class="formula">n′/l′ − n/l = (n′ − n)/r = Φ；  f = −nr/(n′−n)，f′ = n′r/(n′−n)</div><div class="formula-label">球面反射镜公式 (令 n′ = −n，凹面镜 r&lt;0，凸面镜 r&gt;0)</div><div class="formula">1/l′ + 1/l = 2/r = 1/f；  f = f′ = r/2；  凹面镜会聚，凸面镜发散</div><div class="formula-label">近轴光线光路计算与近轴孔径高 h (式 1-5 ~ 1-8)</div><div class="formula">u ≈ h/|l|，  i = (l−r)u/r，  i′ = (n/n′)i，  u′ = u + i − i′，  l′ = r(1 + i′/u′)</div><div class="formula-label">四个放大率计算体系 (教材表 1-2)</div><div class="formula">① 垂轴放大率 (横向线放大率): β = y′/y = n l′ / (n′ l) = (l′ − r)/(l − r)<br>② 轴向放大率 (纵向放大率): α = dl′/dl = (n′/n) β²<br>③ 角放大率: γ = u′/u = (n/n′)(1/β) = l/l′<br>④ 面积放大率 (垂轴截面): S = β²； 体积放大率: V = αβ² = (n′/n) β⁴</div><div class="note"><b>放大率规律与物理意义：</b><br>1. 放大率基本关系恒成立：<b>α · γ = β</b>。<br>2. <b>拉赫不变量</b> (Lagrange-Helmholtz Invariant)：J = n y u = n′ y′ u′ = 常数。<br>3. <b>孔径高与面型切换：</b>可在控制面板选择【折射球面】或【反射球面镜】；调节【近轴孔径高 h】实时改变孔径光线高度与孔径角 u、u′。</div>',
+        hints: "可在控制面板切换【折射球面】与【反射球面镜】；调节近轴孔径高 h 观察孔径光线位置与孔径角 u, u′ 动态变化；调节曲率半径 r、物距 l 与物高 y，观察实像/虚像与四大放大率。",
+        legend: "金色：物 A · 绿色/紫色：实像/虚像 A′ · 天蓝：近轴孔径光线(h) · 蓝/黄/青：经典成像光线 · 橙色：球心 C"
+      },
+      "sphere-exact": {
+        name: "单个球面 (折射与反射) · 实际光路追迹与球差",
+        sidebar: "⑧ 球面光路计算·实际球差",
+        theory: '<div class="card-title mb-2">⑧ 单个球面 (折射与反射) · 实际光线光路追踪 (教材 P3-4 / PDF 第10页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">对于大孔径角 U 的实际光线，必须严格依据折射/反射定律进行三角追踪。不同孔径光线交轴点与近轴焦点之差即为纵向球差。</div><div class="formula-label">折射球面实际光线计算公式 (式 1-1 ~ 1-4)</div><div class="formula">sin I = (L − r) · (sin U / r)<br>sin I′ = (n / n′) · sin I   (折射定律，|sin I′| &gt; 1 时发生全反射)<br>U′ = U + I − I′<br>L′ = r · (1 + sin I′ / sin U′)</div><div class="formula-label">球面反射镜实际光线计算公式 (I′ = −I)</div><div class="formula">sin I = (L − r) · (sin U / r)<br>U′ = U + 2I<br>L′ = r · (1 − sin I / sin U′)</div><div class="formula-label">纵向球差与实际放大率</div><div class="formula">纵向球差: δL′ = L′ − l′  (实际像方截距 L′ 与近轴像距 l′ 的偏离量)<br>实际垂轴放大率: β<sub>real</sub> = (L′ − r)/(L − r) = n sin U / (n′ sin U′)<br>实际角放大率: γ<sub>real</sub> = tan U′ / tan U</div><div class="note"><b>物理现象与球差焦散线：</b><br>1. 随着孔径角 U 增大，边缘光线偏折加剧，交轴截距 L′ 与近轴焦点 l′ 分离，形成<b>球差</b>。<br>2. 无论是折射界面还是反射球面镜，不同孔径辅助光束均展现出特征包络焦散线 (Caustic)。</div>',
+        hints: "可在控制面板切换【折射球面】与【反射球面镜】；调节孔径角 U 观察实际光线交轴点 L′ 与近轴像距 l′ 的偏差（纵向球差 δL′）；改变物方截距 L 与曲率半径 r，验证球差焦散线。",
+        legend: "蓝色：实际入射光 · 绿色：实际折射/反射光 · 黄色虚线：法线 · 青色点：近轴像距 l′ · 橙色线段：纵向球差 δL′"
+      },
+    };
+    const tabs = document.querySelectorAll("#tabs .tab");
+    const nav = document.getElementById("topic-nav");
+    Object.entries(TOPICS).forEach(([key, topic], index) => { const li = document.createElement("li"); li.className = "nav-item" + (index === 0 ? " active" : ""); li.innerHTML = `<a href="#" data-key="${key}">${topic.sidebar}</a>`; nav.appendChild(li); });
+    const navItems = [...nav.querySelectorAll(".nav-item")];
+    let simInstance;
+    function switchTopic(key) {
+      const topic = TOPICS[key];
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.topic === key));
+      navItems.forEach((item) => item.classList.toggle("active", item.querySelector("a").dataset.key === key));
+      document.getElementById("theory-card").innerHTML = topic.theory;
+      document.getElementById("bc-topic").textContent = topic.name;
+      document.getElementById("viz-title").textContent = topic.name;
+      document.getElementById("hints").innerHTML = topic.hints;
+      document.getElementById("legend").innerHTML = `<div class="viz-legend-item"><span class="viz-legend-dot" style="background:#4ade80"></span>${topic.legend}</div>`;
+      if (simInstance) simInstance.destroy();
+      simInstance = new GeometricSim("canvas", "controls", key);
+      document.getElementById("play-btn").textContent = simInstance.params.play ? "⏸ 暂停" : "▶ 播放";
+      document.getElementById("reset-btn").onclick = () => { simInstance.reset(); document.getElementById("play-btn").textContent = simInstance.params.play ? "⏸ 暂停" : "▶ 播放"; };
+      document.getElementById("play-btn").onclick = (event) => simInstance.togglePlay(event.currentTarget);
+      document.getElementById("snapshot-btn").onclick = () => simInstance.snapshot();
+    }
+    tabs.forEach((tab) => tab.addEventListener("click", () => switchTopic(tab.dataset.topic)));
+    navItems.forEach((item) => item.querySelector("a").addEventListener("click", (event) => { event.preventDefault(); switchTopic(event.currentTarget.dataset.key); }));
+    document.addEventListener("DOMContentLoaded", () => switchTopic("straight"));
+  </script>
+</body>
+</html>

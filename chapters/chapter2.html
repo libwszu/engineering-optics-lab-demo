@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第二章 理想光学系统 · 工程光学仿真平台</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="stylesheet" href="../css/style.css?v=20260912a" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">光</div>
+        <div>
+          <div class="logo-text">工程光学</div>
+          <div class="logo-subtitle">仿真实验平台</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">导航</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="../index.html">📚 章节总览</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">已开发章节</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="chapter1.html">① 第一章 几何光学基本定律<span class="nav-badge">Ready</span></a></li>
+          <li class="nav-item active"><a href="chapter2.html">② 第二章 理想光学系统<span class="nav-badge">Ready</span></a></li>
+          <li class="nav-item"><a href="chapter3.html">③ 第三章 平面与平面系统<span class="nav-badge">Ready</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">本章内容 (10个模型)</div>
+        <ul class="nav-list" id="topic-nav">
+          <!-- Dynamically populated by JS -->
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb"><a href="../index.html">首页</a> / <a href="chapter2.html">第二章</a> / <span id="bc-topic">焦点与焦平面</span></div>
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">第二章 · 理想光学系统</h1>
+          <p class="page-subtitle">焦点·主点·节点独立与全景模型、焦距折射率厚度模型、物像共轭、放大率全域、薄透镜箭头组合、透镜曲率模型、正切计算法 · 教材 PDF 第 23~30 页 (书 P16~23)</p>
+        </div>
+        <span class="pill pill-green"><span class="dot"></span> 实时交互仿真</span>
+      </div>
+
+      <div class="chapter9-tab-group-title">基点与基面独立与全景模型 (教材 P16 §2.1)</div>
+      <div class="tabs" id="cardinal-tabs">
+        <div class="tab active" data-topic="focal-plane">🎯 焦点与焦平面</div>
+        <div class="tab" data-topic="principal-plane">📏 主点与主平面</div>
+        <div class="tab" data-topic="nodal-plane">🧭 节点与节平面</div>
+        <div class="tab" data-topic="cardinal">🌐 基点基面综合全景</div>
+      </div>
+
+      <div class="chapter9-tab-group-title">折射率与物像位置关系 (教材 P16~18)</div>
+      <div class="tabs" id="image-tabs">
+        <div class="tab" data-topic="focal-index">🌈 焦距与折射率关系 (含厚度d)</div>
+        <div class="tab" data-topic="gauss-newton">📐 物像位置关系 (图 2-1)</div>
+        <div class="tab" data-topic="magnification">🔍 垂轴放大率随物距变化 (图 2-2)</div>
+      </div>
+
+      <div class="chapter9-tab-group-title">系统组合与光路正切计算 (教材 P18~23)</div>
+      <div class="tabs" id="combo-tabs">
+        <div class="tab" data-topic="ideal-combo">👓 理想光学系统组合 (薄透镜箭头 ⟷/&gt;&lt;)</div>
+        <div class="tab" data-topic="thick-lens">🔬 透镜形状与曲率焦距 (图 2-4 解耦)</div>
+        <div class="tab" data-topic="tangent-method">📐 正切计算法 (教材 P23 例2-4)</div>
+      </div>
+
+      <div class="card mb-4" id="theory-card"></div>
+      
+      <div class="grid workspace-grid">
+        <div class="card" id="controls-panel">
+          <div class="card-header">
+            <div>
+              <div class="card-title">参数控制</div>
+              <div class="card-subtitle">实时调节 · 自动重绘</div>
+            </div>
+            <button class="btn btn-ghost btn-icon" id="reset-btn" title="恢复默认">↺</button>
+          </div>
+          <div id="controls"></div>
+        </div>
+        <div>
+          <div class="viz-container" id="viz" style="height:500px;">
+            <div class="viz-header">
+              <div class="viz-title" id="viz-title">仿真视图</div>
+              <div class="viz-toolbar">
+                <button class="btn" id="play-btn">▶ 播放</button>
+                <button class="btn" id="snapshot-btn">📷 截图</button>
+              </div>
+            </div>
+            <canvas id="canvas"></canvas>
+            <div class="viz-legend" id="legend"></div>
+          </div>
+          <div class="grid grid-3 mt-3" id="readouts"></div>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-title mb-2">💡 实验提示</div>
+        <div class="text-secondary" id="hints" style="font-size:13px;line-height:1.8;"></div>
+      </div>
+    </main>
+  </div>
+  <script src="../js/sim-core.js?v=20260912a"></script>
+  <script src="../js/sim-geometric.js?v=20260912a"></script>
+  <script>
+    const TOPICS = {
+      "focal-plane": {
+        name: "焦点与焦平面独立示意模型 (教材第 16 页 §2.1)",
+        sidebar: "🎯 焦点与焦平面",
+        theory: '<div class="card-title mb-2">焦点与焦平面的物理定义与共轭性质 (教材第 16 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">焦点是光学系统的核心基点，焦平面则是与无穷远共轭的特殊基面。</div><div class="formula">物像方焦距关系 (式 2-1): f′/f = -n′/n (同介质时 f′ = -f)<br>像方焦面轴外共轭高: y′_F = f′·tan U<br>物方焦面轴外出射角: tan U′ = -y_F/f′</div><div class="note"><b>四大核心物理特征：</b><br>1. <b>像方焦点 F′ 与焦平面:</b> 平行于光轴入射的一束平行光，折射后聚于像方焦点 F′；若入射平行光与光轴夹角为 U，则聚焦于像方焦平面上的轴外点 F′_w，聚焦点高度为 y′_F = f′·tan U。<br>2. <b>物方焦点 F 与焦平面:</b> 位于物方焦平面上的任一点发出的同心发散光束，经光学系统折射后，必转变为一束平行光束；轴上焦点 F 发出者出射平行于光轴，轴外点 y_F 发出者出射为倾斜平行光。<br>3. <b>实焦点与虚焦点:</b> f′>0 (正透镜) 时折射光线真实交会于实焦点；f′<0 (负透镜) 时折射光线发散，由反向延长线交会于虚焦点。<br>4. <b>薄透镜标准符号:</b> 竖直直线端部箭头朝外 (⟷) 代表正透镜；箭头朝内 (><) 代表负透镜。</div>',
+        hints: "调节像方焦距 f′（可跨越正负焦距，对比凸透镜会聚与凹透镜发散）；从下拉菜单切换【轴上平行光】、【焦点发光】、【倾斜平行光】与【焦面轴外物点】4 种模式，观察光束在焦平面上的严格共轭聚焦规律。",
+        legend: "🔹薄透镜(正⟷/负><) 🟢物方焦点F与焦面 🔵像方焦点F′与焦面 🟡入射/出射光束"
+      },
+      "principal-plane": {
+        name: "主点与主平面独立示意模型 (教材第 16 页 §2.1)",
+        sidebar: "📏 主点与主平面",
+        theory: '<div class="card-title mb-2">主点与主平面：垂轴放大率 β = +1 的共轭平面 (教材第 16 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">主平面是表征理想光学系统横向放大性质与折射位置基准的关键基面。</div><div class="formula">垂轴放大率定义: β = y′_H / y_H = +1.000<br>主面截距高度恒等: h′ ≡ h (光线在两主面之间平行光轴等高传递)<br>角偏折量: tan U′ - tan U = -h / f′</div><div class="note"><b>核心性质精析：</b><br>1. <b>等高传递性 (h′ = h):</b> 任何光线自物方入射到物方主面 H，交点高度为 h；则对应的出射共轭光线必自像方主面 H′ 的完全相同高度 h′ 处出射！两主面之间光线恒作水平平移。<br>2. <b>β = +1 的物理意义:</b> 在物方主面上放置任意高度的物体 y_H，其在像方主面上成的共轭像大小严格相等、方向严格相同 (y′_H = y_H)，既不倒立也不缩放。<br>3. <b>距离度量基准:</b> 理想光学系统中，物距 l 恒以物主点 H 为度量起点；像距 l′ 恒以像主点 H′ 为度量起点。物方焦距 f = HF，像方焦距 f′ = H′F′。</div>',
+        hints: "调节入射高度 h 与入射角 U，观察光线穿过主平面时 Q(H,h) 至 Q′(H′,h) 的等高水平连线；勾选【在主面上放置物体】，动态验证两主面共轭物像垂轴放大率严格等于 +1.000；调节主面间距 d_H 可观察薄透镜重合 (d_H=0) 与厚透镜分离。",
+        legend: "🔹物方主面H 🔷像方主面H′ 🟡等高光线(h′=h) 🟣主面共轭物像(β=+1)"
+      },
+      "nodal-plane": {
+        name: "节点与节平面独立示意模型 (教材第 16 页 §2.1 式 2-3)",
+        sidebar: "🧭 节点与节平面",
+        theory: '<div class="card-title mb-2">节点与节平面：角放大率 γ = +1 的共轭点 (教材第 16 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">节点是决定光线方向不发生角偏折的关键共轭点，其位置受介质折射率直接控制。</div><div class="formula">角放大率定义: γ = tan U′ / tan U = +1.000 (出射光与入射光严格平行)<br>节点坐标 (式 2-3): x_J = f′ , x′_J = f<br>节点相对主面位移: Δ_J = f + f′ = f′(1 - n/n′)</div><div class="note"><b>节点与介质核心规律：</b><br>1. <b>方向不变性 (γ = +1):</b> 凡是瞄准物方节点 J 入射的光线（倾角为 U），折射后必通过像方节点 J′，且出射倾角 U′ 严格等于入射角 U，光线方向绝不改变。<br>2. <b>同一介质 (n = n′):</b> 此时 f = -f′，节点相对主面位移 Δ_J = 0！因此在空气中的光学系统中，节平面与主平面完全重合 (J ≡ H, J′ ≡ H′)。<br>3. <b>不同介质 (n ≠ n′):</b> 如人眼模型 (外侧空气 n=1.0，内侧房水/玻璃体 n′=1.336) 或水下镜头，物像方焦距不等，节平面明显脱离主平面发生位移 Δ_J！</div>',
+        hints: "可直接选择【人眼光学模型】、【物像同在空气中】或【水下物镜】预设；调节入射角 U，动态检验出射角与入射角完全相等 (γ = 1.000)；调节 n 与 n′，观察节点 J, J′ 相对主面 H, H′ 的位移过程。",
+        legend: "🔹主平面H,H′ 🟡节平面J,J′ 🟢平行共轭光线(U′=U) 🟣位移量Δ_J"
+      },
+      "cardinal": {
+        name: "基点与基面综合全景模型 (教材 P16 §2.1)",
+        sidebar: "🌐 基点基面全景",
+        theory: '<div class="card-title mb-2">理想光学系统的三对基点与基面全景图 (教材第 16 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">同屏综合展示焦点 (F, F′)、主点 (H, H′) 与节点 (J, J′) 及三对基面与全套特征光路追迹。</div><div class="formula">物像方焦距关系 (式 2-1): f′/f = -n′/n<br>节点位移关系 (式 2-3): Δ_J = f + f′ = f′(1 - n/n′)<br>高斯成像公式: f′/l′ + f/l = 1</div><div class="note"><b>三对基面功能总揽：</b><br>• <b>焦平面 (F, F′):</b> 决定系统的聚光与准直能力，与无穷远共轭；<br>• <b>主平面 (H, H′):</b> 垂轴放大率 β = +1，等高传递 h′=h，为物距与像距的起算基准；<br>• <b>节平面 (J, J′):</b> 角放大率 γ = +1，穿过节点光线平行无偏角，n=n′ 时与主面重合。</div>',
+        hints: "调节物距与物高，观察三条经典特征光线（平行光轴过焦点、过主面等高传递、过节点平行出射）在像点处的完美重合；调节 n 与 n′ 可观察节平面的联动平移。",
+        legend: "🔹物/像 🔸主平面(β=+1) 🟡节平面(γ=+1) 🟢焦平面"
+      },
+      "focal-index": {
+        name: "焦距与折射率及厚度关系模型 (教材 P16 式 2-1 与 P20 式 2-13, 2-14)",
+        sidebar: "🌈 焦距与折射率关系",
+        theory: '<div class="card-title mb-2">焦距与折射率关系 · 介质环境效应与中心厚度贡献 (教材 P16 & P20)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">透镜的焦距取决于材料折射率 n_g、环境折射率 n₀、前后曲率半径 r₁, r₂ 以及中心厚度 d。</div><div class="formula">厚透镜精确光焦度公式 (教材 P20 式 2-14):<br>Φ = [(n_g - n₀)/n₀](1/r₁ - 1/r₂) + [(n_g - n₀)²/(n_g n₀)]·d/(r₁r₂)<br>f′ = 1/Φ  (薄透镜为 d=0 的极限情形)</div><div class="note"><b>物理现象与厚度效应深度剖析：</b><br>1. <b>中心厚度 d 贡献项:</b> 式中第二项为厚度附加项，当透镜较厚且曲率较小时，中心厚度会显著改变系统总光焦度；d=0 时精确退化为经典薄透镜公式。<br>2. <b>介质折射率匹配 (n_g = n₀):</b> 透镜置于折射率相同的介质中（如玻璃放入匹配浸油），两相界面无任何折射，平行光直通穿过，透镜完全“隐形”，f′→∞。<br>3. <b>介质反向效应 (n_g < n₀):</b> 当环境折射率高于透镜时（如水中的空气泡或高折射率液体中的低折射率透镜），几何双凸透镜反转为发散负透镜！</div>',
+        hints: "调节中心厚度 d，观察透镜实体厚度与光焦度数值的实时变化；调节环境折射率 n₀ 与材料折射率 n_g，体验平行光束从会聚到直穿再到发散的逆转过程；右侧图表支持切换以 n₀、n_g 或厚度 d 作为横轴绘制关系曲线。",
+        legend: "🔹透镜实体(含厚度d) 🔸折射光束 🟢焦点F′ 🟣f′-X 关系曲线 🟡当前工作点"
+      },
+      "gauss-newton": {
+        name: "理想光学系统的物像位置关系 (教材第 17 页 图 2-1)",
+        sidebar: "📐 物像位置关系(图2-1)",
+        theory: '<div class="card-title mb-2">理想光学系统的物像位置关系 · 图 2-1 经典作图 (教材第 17 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">100% 还原蔡怀宇教材图 2-1 的作图法则与几何标尺体系，统一牛顿公式与高斯公式。</div><div class="formula">牛顿公式 (式 2-4): x·x′ = f·f′<br>高斯公式 (式 2-5): f′/l′ + f/l = 1 (同介质时 1/l′ - 1/l = 1/f′)<br>垂轴放大率 (式 2-6): β = y′/y = -f/x = -x′/f′ = l′/l</div><div class="note"><b>图 2-1 作图特征光线：</b><br>1. <b>第一条特征光线 (顶线):</b> 自物点 A 平行光轴入射至物主面 Q，水平传递至像主面 Q′ (高度均为 y)，折射后穿过像方焦点 F′ 到达像点 A′。<br>2. <b>第二条特征光线 (底线):</b> 自物点 A 穿过物方焦点 F 入射至物主面 (高度为 -y′)，水平传递至像主面后，平行于光轴出射至像点 A′。<br>3. 坐标符号规则：H 到 F 为 -f，H 到 B 为 -l，F 到 B 为 -x；H′ 到 F′ 为 f′，F′ 到 B′ 为 x′，H′ 到 B′ 为 l′。</div>',
+        hints: "调节物距 l、焦距 f′ 与物高 y，观察牛顿坐标 (-x, x′) 与高斯坐标 (-l, l′) 的实时联动；下方公式核验卡片实时计算 xx′ 与 ff′，绝对误差恒等于 0.00。",
+        legend: "🔹物点A/B 🔸像点A′/B′ 🟡主面截距Q/Q′ 🟢焦点F/F′"
+      },
+      "magnification": {
+        name: "垂轴放大率随物距的变化 (教材第 18 页 图 2-2 及 表 2-2)",
+        sidebar: "🔍 垂轴放大率(图2-2)",
+        theory: '<div class="card-title mb-2">垂轴放大率 β 随物距 l 的变化关系 (教材第 18 页 图 2-2 & 表 2-2)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">薄透镜系统采用标准实线加向外/向内箭头符号，依据 β 深度分析成像虚实大小正反。</div><div class="formula">β = y′/y = l′/l = f′/(l + f′)</div><div class="note"><b>薄透镜符号与全区域成像性质表 (表 2-2)：</b><br>• <b>正透镜 (f′>0，箭头向外 ⟷):</b><br>&nbsp;&nbsp;区域 I (-∞, -2f′): 倒立缩小实像 (-1 < β < 0，实物)<br>&nbsp;&nbsp;区域 II (-2f′, -f′): 倒立放大实像 (β < -1，实物)<br>&nbsp;&nbsp;区域 III (-f′, 0): 正立放大虚像 (β > 1，实物)<br>&nbsp;&nbsp;区域 IV (0, +∞): 正立缩小实像 (0 < β < 1，虚物)<br>• <b>负透镜 (f′<0，箭头向内 ><):</b><br>&nbsp;&nbsp;区域 I (-∞, 0): 正立缩小虚像 (0 < β < 1，实物)<br>&nbsp;&nbsp;区域 II (0, |f|): 正立放大实像 (β > 1，虚物)<br>&nbsp;&nbsp;区域 III (|f|, 2|f|): 倒立放大虚像 (β < -1，虚物)<br>&nbsp;&nbsp;区域 IV (2|f|, +∞): 倒立缩小虚像 (-1 < β < 0，虚物)</div>',
+        hints: "可切换【正透镜组 (f′>0，⟷)】与【负透镜组 (f′<0，><)】；拖动物距滑块可跨越实物 (l<0) 与虚物 (l>0) 全区域，右侧图表实时高亮所在区域罗马数字与渐近双曲线工作点。",
+        legend: "🔹薄透镜符号 🔸实像/虚像 🟢β-l 双曲线 🟡当前工作点"
+      },
+      "ideal-combo": {
+        name: "两薄透镜组合 · 焦距与主面 (教材第 18-19 页 式 2-7~2-10 及 图 2-3)",
+        sidebar: "👓 理想系统组合(图2-3)",
+        theory: '<div class="card-title mb-2">两光组组合焦距、光焦度与主面位置 (教材第 18~19 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">薄透镜无厚度，全面采用标准线加箭头表示：焦距为正箭头向两端外侧 (⟷)，焦距为负箭头指向光轴中心 (><)。</div><div class="formula">组合焦距 (式 2-7): f′ = -f₁′f₂′/Δ  (光学间隔 Δ = d - f₁′ - f₂′)<br>光焦度 (式 2-8): Φ = Φ₁ + Φ₂ - d·Φ₁Φ₂<br>像方位置 (式 2-9, 2-10): l′_F = f′(1 - d/f₁′) ,  l′_H = -f′·d/f₁′<br>物方位置: l_F = f′(1 - d/f₂′) ,  l_H = f′·d/f₂′</div><div class="note"><b>典型光组预设与工业应用 (教材表 2-3)：</b><br>1. <b>远摄型光组 (正组在前，负组在后):</b> 组合主面向前外悬挂，使组合焦距大于机械筒长 (f′ > L)，极大缩短长焦距镜头物理尺寸。<br>2. <b>反远距型光组 (负组在前，正组在后):</b> 组合主面向后外悬挂，使后工作距离大于系统焦距 (l′_F > f′)，广泛用于单反相机广角镜头与显微物镜。<br>3. <b>望远无焦系统 (Δ→0):</b> 平行光入射平行光出射。</div>',
+        hints: "可通过预设下拉框直接加载【远摄型】、【反远距型】和【望远系统】结构；自由调节 f₁′、f₂′ 和间距 d，观察正负透镜标准箭头方向切换，以及组合主面 H, H′ 与焦点 F, F′ 的光线追迹。",
+        legend: "🔹L₁/L₂薄透镜(⟷/><) 🔸组合系统主面H,H′ 🟢特征光路 🟣f′-d 关系曲线"
+      },
+      "thick-lens": {
+        name: "透镜形状与曲率焦距模型 (教材第 20 页 图 2-4 与 式 2-13~2-15 · 彻底解耦)",
+        sidebar: "🔬 透镜形状与曲率焦距",
+        theory: '<div class="card-title mb-2">单个透镜的焦距与光焦度公式 (教材第 20 页)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">【前后表面彻底独立解耦】真实绘制双凸、平凸、月凸、双凹、平凹、月凹 6 种经典透镜型线。</div><div class="formula">厚透镜焦距 (式 2-13): f′ = n r₁r₂ / [(n-1){n(r₂-r₁) + (n-1)d}]<br>光焦度 (式 2-14): Φ = (n-1)(ρ₁ - ρ₂) + [(n-1)²/n]·d·ρ₁ρ₂ (其中 ρ₁=1/r₁, ρ₂=1/r₂)<br>薄透镜公式 (式 2-15, d=0): Φ₀ = (n-1)(ρ₁ - ρ₂) , f′₀ = 1/Φ₀</div><div class="note"><b>图 2-4 六类透镜几何特征与符号规则：</b><br>• <b>双凸:</b> r₁>0, r₂<0 ； <b>平凸:</b> r₁>0, r₂=∞ ； <b>月凸:</b> r₁>0, r₂>0 (r₁<r₂)<br>• <b>双凹:</b> r₁<0, r₂>0 ； <b>平凹:</b> r₁<0, r₂=∞ ； <b>月凹:</b> r₁>0, r₂>0 (r₁>r₂)<br>• 改变任意一个面的曲率半径，另一个面轮廓<b>绝对保持不动</b>！</div>',
+        hints: "从下拉菜单选择图 2-4 的 6 种透镜预设；调节 r₁ 只有前表面形变，调节 r₂ 只有后表面形变，完全独立解耦；可在右下方切换自变量 (r₁, r₂, ρ₁, ρ₂, d, n) 观察焦距变化趋势并播放扫描动画。",
+        legend: "🔹厚透镜实体 🔸主点位置 🟢平行光聚焦 🟣参数扫描曲线 🟡当前工作点"
+      },
+      "tangent-method": {
+        name: "近轴光线正切计算法模型 (教材第 23 页 例 2-4 及 图 2-6)",
+        sidebar: "📐 正切计算法(例2-4)",
+        theory: '<div class="card-title mb-2">近轴光线正切计算法与远摄型光组设计 (教材第 23 页 例 2-4)</div><div class="text-secondary" style="font-size:13px;margin-bottom:12px;">长焦距物镜采用正组在前、负组在后的远摄型结构，利用正切计算公式或组合透镜公式反求两组焦距与间隔。</div><div class="formula">组合焦距正切定义: f′ = h₁ / tan u′₂<br>后工作距正切定义: tan u′₂ = h₂ / l′_F  ⇒  h₁ / h₂ = f′ / l′_F<br>第一光组偏折渡越: tan u′₁ = h₁ / f′₁ , h₂ = h₁ - d·tan u′₁  ⇒  f′₁ = d / (1 - h₂/h₁)<br>第二光组偏折公式: tan u′₂ = tan u′₁ + h₂ / f′₂  ⇒  f′₂ = (d - f′₁) / (1 - f′₁/f′)<br>机械筒长与像主面: L = d + l′_F , l′_H = -f′·d / f′₁</div><div class="note"><b>正切计算法五大精髓与远摄型物理实质 (图 2-6)：</b><br>1. <b>筒长与间距关系:</b> 系统的机械总长度（顶点到像面）为筒长 L = d + l′_F，已知筒长 L 与工作距 l′_F 时直接解得光组间隔 d = L - l′_F = 300 mm。<br>2. <b>高度比等于焦距与工作距之比:</b> 由平行动光正切比值直接导出 h₁/h₂ = f′/l′_F = 1200/400 = 3，立刻确定第二透镜上的入射光线高度为 h₂ = h₁/3。<br>3. <b>像方主面前置外悬:</b> 远摄物镜的像主面 H′ 悬挂在第一透镜的前方（外悬距离达 500 mm），使得等效组合焦距 f′ (1200 mm) 显著大于物理筒长 L (700 mm)，实现镜头的大幅小型轻量化！<br>4. <b>双模式自由切换:</b> 支持【逆向设计模式】（由目标 f′, L, l′_F 反求透镜）与【正向光路追迹模式】（由 f′₁, f′₂, d 追迹正切角与像方参数）。</div>',
+        hints: "可直接切换【教材例 2-4 远摄长焦物镜】、【反远距型广角镜头】或【教材例 2-5 组合】预设；支持逆向设计与正向光路追迹双模式自由切换，实时观察光线经 L₁ 偏折至高度 h₂ 再经负透镜 L₂ 发散汇聚至 F′ 的全过程，及其反向延长线在像主面 H′ 处的精确交汇。",
+        legend: "🔹L₁透镜(正⟷) 🟣L₂透镜(负><) 🟡像方主面H′与交点Q′ 🟢焦点F′ 🔶折射光路与虚线延长线"
+      }
+    };
+
+    const tabs = document.querySelectorAll(".tabs .tab");
+    const nav = document.getElementById("topic-nav");
+    
+    Object.entries(TOPICS).forEach(([key, topic], index) => {
+      const li = document.createElement("li");
+      li.className = "nav-item" + (index === 0 ? " active" : "");
+      li.innerHTML = `<a href="#" data-key="${key}">${topic.sidebar}</a>`;
+      nav.appendChild(li);
+    });
+    
+    const navItems = [...nav.querySelectorAll(".nav-item")];
+    let simInstance;
+    
+    function switchTopic(key) {
+      const topic = TOPICS[key];
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.topic === key));
+      navItems.forEach((item) => item.classList.toggle("active", item.querySelector("a").dataset.key === key));
+      document.getElementById("theory-card").innerHTML = topic.theory;
+      document.getElementById("bc-topic").textContent = topic.sidebar.replace(/[^ \u4e00-\u9fa5a-zA-Z0-9]/g, '').trim();
+      document.getElementById("viz-title").textContent = topic.name;
+      document.getElementById("hints").innerHTML = topic.hints;
+      document.getElementById("legend").innerHTML = `<div class="viz-legend-item"><span class="viz-legend-dot" style="background:#4ade80"></span>${topic.legend}</div>`;
+      
+      if (simInstance) simInstance.destroy();
+      
+      if (key === "focal-plane") {
+        simInstance = new FocalPointsSim("canvas", "controls");
+      } else if (key === "principal-plane") {
+        simInstance = new PrincipalPointsSim("canvas", "controls");
+      } else if (key === "nodal-plane") {
+        simInstance = new NodalPointsSim("canvas", "controls");
+      } else if (key === "cardinal") {
+        simInstance = new CardinalPointsSim("canvas", "controls");
+      } else if (key === "focal-index") {
+        simInstance = new FocalIndexSim("canvas", "controls");
+      } else if (key === "gauss-newton") {
+        simInstance = new GaussNewtonSim("canvas", "controls");
+      } else if (key === "magnification") {
+        simInstance = new MagnificationSim("canvas", "controls");
+      } else if (key === "ideal-combo" || key === "thin-lens-combo") {
+        simInstance = new IdealComboSim("canvas", "controls");
+      } else if (key === "thick-lens") {
+        simInstance = new LensCombinationSim("canvas", "controls");
+      } else if (key === "tangent-method") {
+        simInstance = new TangentMethodSim("canvas", "controls");
+      }
+      
+      const playBtn = document.getElementById("play-btn");
+      const hasPlay = simInstance.params && simInstance.params.play !== undefined;
+      if (hasPlay) {
+        playBtn.style.display = "inline-flex";
+        playBtn.textContent = simInstance.params.play ? "⏸ 暂停" : "▶ 播放";
+      } else {
+        playBtn.style.display = "none";
+      }
+
+      document.getElementById("reset-btn").onclick = () => {
+        simInstance.reset();
+        if (hasPlay) playBtn.textContent = simInstance.params.play ? "⏸ 暂停" : "▶ 播放";
+      };
+      playBtn.onclick = (event) => simInstance.togglePlay?.(event.currentTarget);
+      document.getElementById("snapshot-btn").onclick = () => simInstance.snapshot();
+    }
+    
+    tabs.forEach((tab) => tab.addEventListener("click", () => switchTopic(tab.dataset.topic)));
+    navItems.forEach((item) => item.querySelector("a").addEventListener("click", (event) => {
+      event.preventDefault();
+      switchTopic(event.currentTarget.dataset.key);
+    }));
+    
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => switchTopic("focal-plane"));
+    } else {
+      switchTopic("focal-plane");
+    }
+  </script>
+</body>
+</html>

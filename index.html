@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>工程光学仿真实验平台 · 第 1–3 章</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="css/style.css?v=20260912a" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="logo">光</div><div><div class="logo-text">工程光学</div><div class="logo-subtitle">仿真实验平台 · 前三章</div></div></div>
+      <div class="nav-section"><div class="nav-title">导航</div><ul class="nav-list"><li class="nav-item active"><a href="index.html">📚 章节总览</a></li></ul></div>
+      <div class="nav-section"><div class="nav-title">实验章节</div><ul class="nav-list">
+        <li class="nav-item"><a href="chapters/chapter1.html">① 几何光学基本定律</a></li>
+        <li class="nav-item"><a href="chapters/chapter2.html">② 理想光学系统</a></li>
+        <li class="nav-item"><a href="chapters/chapter3.html">③ 平面与平面系统</a></li>
+      </ul></div>
+    </aside>
+    <main class="main">
+      <div class="breadcrumb">首页 / 章节总览</div>
+      <div class="page-header"><div><h1 class="page-title">工程光学仿真实验平台</h1><p class="page-subtitle">第 1–3 章 · 24 个实验主题 · 在调参与光路变化中理解几何光学</p></div><span class="pill pill-green"><span class="dot"></span> 交互实验</span></div>
+      <div class="card mb-4"><div class="card-title mb-2">从基本定律到光学系统</div><p class="text-secondary">选择章节进入实验，调节参数观察光路、成像与数值读数。各实验提供理论说明、操作提示和截图功能。</p><a class="btn btn-primary mt-3" href="chapters/chapter1.html">开始第一章 →</a></div>
+      <h2 class="card-title mb-3">📘 几何光学实验</h2>
+      <div class="grid grid-3 mb-4" id="chapters-grid"></div>
+      <div class="card mt-4"><p class="text-muted" style="font-size:12px;text-align:center;">工程光学仿真实验平台 · HTML5 Canvas + 原生 JavaScript · 支持本地运行</p></div>
+    </main>
+  </div>
+  <script src="data/chapters.js?v=20260912a"></script>
+  <script>
+    const grid = document.getElementById("chapters-grid");
+    CHAPTERS.forEach((chapter) => {
+      const card = document.createElement("a");
+      card.href = chapter.href;
+      card.className = "chapter-card active";
+      const number = document.createElement("div");
+      number.className = "chapter-number";
+      number.textContent = "第 " + chapter.id + " 章";
+      const title = document.createElement("div");
+      title.className = "chapter-name";
+      title.textContent = chapter.name;
+      const description = document.createElement("div");
+      description.className = "chapter-desc";
+      description.textContent = chapter.desc;
+      const footer = document.createElement("div");
+      footer.className = "chapter-footer";
+      footer.textContent = chapter.topics.length + " 个实验主题 →";
+      card.append(number, title, description, footer);
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# JavaScript dependencies and generated output
+node_modules/
+coverage/
+dist/
+build/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+
+# Temporary working files
+*.tmp
+*.bak
